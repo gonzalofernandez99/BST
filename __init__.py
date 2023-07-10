@@ -37,7 +37,6 @@ tmp_global_obj = tmp_global_obj #type:ignore
 PrintException = PrintException #type:ignore
 SetVar = SetVar #type:ignore
 GetGlobals = GetGlobals #type:ignore
-
 # Add modules libraries to Rocektbot
 # -----------------------------------
 module = GetParams("module")
