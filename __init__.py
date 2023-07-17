@@ -158,3 +158,40 @@ if module == "transform_dates":
         print(f"Error al guardar el archivo: {e}")
         PrintException()
         raise e
+    
+if module == "keep_row_value":
+    path = GetParams("path")
+    hoja_from = GetParams("hoja_from")
+    hoja_to  = GetParams("hoja_to")
+    value = GetParams("value")
+    column = GetParams("Column")
+    try:
+        # Leer el archivo Excel y las hojas específicas
+        xls = pd.ExcelFile(path)
+        if hoja_from not in xls.sheet_names or hoja_to not in xls.sheet_names:
+            raise ValueError("Las hojas especificadas no existen en el archivo Excel")
+
+        df_from = pd.read_excel(xls, hoja_from)
+        df_to = pd.read_excel(xls, hoja_to)
+
+        # Verificar que la columna exista
+        if column not in df_from.columns:
+            raise ValueError("La columna especificada no existe en la hoja de origen")
+
+        # Filtrar los datos
+        df_filtrado = df_from[df_from[column] == value]
+
+        # Copiar los datos filtrados a la hoja_to
+        df_to = pd.concat([df_to, df_filtrado], ignore_index=True)
+
+        # Escribir el DataFrame resultante de nuevo al archivo Excel
+        with pd.ExcelWriter(path) as writer:  
+            df_to.to_excel(writer, sheet_name=hoja_to, index=False)
+            df_from.to_excel(writer, sheet_name=hoja_from, index=False)
+
+    except FileNotFoundError:
+        print(f"El archivo {path} no existe")
+    except PermissionError:
+        print(f"No se tienen permisos de lectura/escritura para el archivo {path}")
+    except Exception as e:
+        print(f"Ha ocurrido un error inesperado: {str(e)}")
